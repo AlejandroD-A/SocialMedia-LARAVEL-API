@@ -2,10 +2,12 @@
 
 namespace App\Exceptions;
 
-use App\Traits\ApiResponse;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Throwable;
+use App\Traits\ApiResponse;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -40,12 +42,17 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
         });
-        $this->renderable(function (Exception $e, $request) {
-
-
-            if (env('APP_ENV') == 'other') {
+        $this->renderable(function (Exception $e) {
+            if (env('APP_ENV') == 'local') {
+                if ($e instanceof ValidationException) {
+                    return $this->errorResponse($e->getMessage(), $code = $e->status, $msj = $e->errors());
+                }
                 if ($e instanceof NotFoundHttpException) {
                     return $this->errorResponse("Pagina no encontrada", $code = 404, $msj = "Pagina no encontrada");
+                }
+
+                if ($e instanceof QueryException) {
+                    return $this->errorResponse("Query Error", $code = 404, $msj = "Pagina no encontrada");
                 }
 
                 if ($e instanceof ModelNotFoundException) {

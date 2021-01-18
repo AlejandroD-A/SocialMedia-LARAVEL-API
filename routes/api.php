@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\PostController;
@@ -16,13 +17,16 @@ use App\Http\Controllers\api\TagController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+/* Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
-});
+}); */
 
 Route::resource('post', PostController::class)->only([
     'index', 'show'
 ]);
+
+Route::post('auth/register', [AuthController::class, 'register']);
+Route::post('auth/login', [AuthController::class, 'login']);
 
 Route::get('post/t/{tag}', [PostController::class, 'tag']);
 
