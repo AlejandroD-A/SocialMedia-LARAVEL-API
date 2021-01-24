@@ -11,6 +11,11 @@ class Post extends Model
 
     protected $fillable = ['title', 'content', 'cover'];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function tags()
     {
         return $this->morphToMany(Tag::class, 'taggable')->withTimestamps();

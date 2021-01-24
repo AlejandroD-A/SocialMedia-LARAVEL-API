@@ -29,6 +29,7 @@ Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/login', [AuthController::class, 'login']);
 
 Route::get('post/t/{tag}', [PostController::class, 'tag']);
+Route::post('post', [PostController::class, 'store'])->middleware('auth:api');
 
 Route::get('tag', [TagController::class, 'index']);
 Route::get('tag/thrends', [TagController::class, 'thrends']);

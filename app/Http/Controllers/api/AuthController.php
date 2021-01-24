@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,12 +35,10 @@ class AuthController extends ApiResponseController
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return $this->errorResponse('0', 400, 'invalid Credentials');
+            return $this->errorResponse('0', 401, 'invalid Credentials');
         }
-        $user = Auth::user();
-        $token = $user->createToken('authToken')->accessToken;
-
-
-        return $this->successResponse(['user' => $user, 'access_token' => $token]);
+        $user = $request->user();
+        $token = $user->createToken('authToken');
+        return response()->json(['user' => $user, 'access_token' => $token->accessToken, 'token_type' => 'Bearer ', 'expires_at' => Carbon::parse($token->token->expires_at)->toDateTimeString()]);
     }
 }
