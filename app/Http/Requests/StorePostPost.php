@@ -26,7 +26,7 @@ class StorePostPost extends FormRequest
         return [
             'title' => 'required | min:5 | max:50',
             'content' => 'required | min:5',
-            'cover' => 'required | min:2',
+            'cover' => 'required | image',
             'tags.*.name' => 'min:2 | max:30'
         ];
     }

@@ -5,10 +5,12 @@ namespace App\Http\Controllers\api;
 use App\Models\Tag;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StorePostPost;
 use Illuminate\Support\Facades\Auth;
+
+use Intervention\Image\Facades\Image;
 use App\Http\Controllers\api\ApiResponseController;
-use Illuminate\Support\Facades\DB;
 
 class PostController extends ApiResponseController
 {
@@ -19,8 +21,9 @@ class PostController extends ApiResponseController
      */
     public function index()
     {
-        $posts = Post::orderBy('created_at', 'desc')->paginate(20);
-        $posts->load('tags');
+        $posts = Post::with(['tags:id,name', 'user:id,username,avatar'])->orderBy('created_at', 'desc')->paginate(5);
+
+
 
         return $this->successResponse($posts);
     }
@@ -48,25 +51,37 @@ class PostController extends ApiResponseController
     {
         $user = $request->user();
         $validated = $request->validated();
-        $validatedPost = ['title' => $validated['title'], 'content' => $validated['content'], 'cover' => $validated['cover']];
 
-        $post = new Post($validatedPost);
 
-        DB::transaction(function () use ($user, $post, $validated) {
-
+        $tags = [];
+        if (array_key_exists('tags', $validated)) {
             $tags = $validated['tags'];
-            $listOfTags = [];
+            unset($validated['tags']);
+        }
 
-            foreach ($tags as $tag) {
-                $tag = Tag::firstOrCreate($tag);
-                array_push($listOfTags, $tag->id);
-            }
+        $post = new Post($validated);
 
+        $imagePath = $validated['cover']->store('uploads', 'public');
+
+        $image = Image::make(public_path("storage/{$imagePath}"));
+        $image->save();
+
+        $post->cover = $imagePath;
+
+        DB::transaction(function () use ($user, $post, $tags) {
             $post->user_id = $user->id;
 
             $post->save();
+            if (count($tags) > 0) {
 
-            $post->tags()->attach($listOfTags);
+                $listOfTags = [];
+                foreach ($tags as $tag) {
+                    $tag = Tag::firstOrCreate($tag);
+                    array_push($listOfTags, $tag->id);
+                }
+
+                $post->tags()->attach($listOfTags);
+            }
         });
 
         return $this->successResponse($post, 201, 'Post created Succesfully');
