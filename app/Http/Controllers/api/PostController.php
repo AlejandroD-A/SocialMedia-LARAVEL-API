@@ -63,7 +63,7 @@ class PostController extends ApiResponseController
 
         $imagePath = $validated['cover']->store('uploads', 'public');
 
-        $image = Image::make(public_path("storage/{$imagePath}"));
+        $image = Image::make("storage/{$imagePath}");
         $image->save();
 
         $post->cover = $imagePath;
