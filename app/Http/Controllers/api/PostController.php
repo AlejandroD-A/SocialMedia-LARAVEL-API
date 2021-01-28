@@ -7,10 +7,11 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StorePostPost;
-use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Facades\Image;
 use App\Http\Controllers\api\ApiResponseController;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class PostController extends ApiResponseController
 {
@@ -60,12 +61,15 @@ class PostController extends ApiResponseController
         }
 
         $post = new Post($validated);
-
-        $imagePath = $validated['cover']->store('uploads', 'public');
-        /* 
-        $image = Image::make("storage/{$imagePath}");
-        $image->save(); */
-
+        $imagePath = Cloudinary::upload($validated['cover']->getRealPath(), [
+            'folder' => 'uploads',
+            'transformation' => [
+                'width' => 1200,
+                'crop' => 'limit',
+                'quality' => 'auto',
+                'fetch_format' => 'auto'
+            ]
+        ])->getSecurePath();
         $post->cover = $imagePath;
 
         DB::transaction(function () use ($user, $post, $tags) {
