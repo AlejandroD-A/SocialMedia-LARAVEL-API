@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Routing\UrlGenerator;
 use Laravel\Passport\Passport;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,6 +29,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(UrlGenerator $url)
     {
+        DB::listen(function ($query) {
+            Log::info(
+                $query->sql,
+                $query->bindings,
+                $query->time
+            );
+        });
         if (env('REDIRECT_HTTPS')) {
             $url->formatScheme('https://');
         }

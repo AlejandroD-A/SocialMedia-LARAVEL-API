@@ -22,14 +22,19 @@ use App\Http\Controllers\api\TagController;
 }); */
 
 Route::resource('post', PostController::class)->only([
-    'index', 'show'
+    'index', 'show',
 ]);
+Route::post('post/restore/{post}', [PostController::class, 'restore'])->middleware('auth:api');
+
+Route::get('post/t/{tag}', [PostController::class, 'tag']);
+Route::post('post', [PostController::class, 'store'])->middleware('auth:api');
+Route::delete('post/{post_id}', [PostController::class, 'destroy'])->middleware('auth:api');
+
 
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/login', [AuthController::class, 'login']);
 
-Route::get('post/t/{tag}', [PostController::class, 'tag']);
-Route::post('post', [PostController::class, 'store'])->middleware('auth:api');
+
 
 Route::get('tag', [TagController::class, 'index']);
 Route::get('tag/thrends', [TagController::class, 'thrends']);
