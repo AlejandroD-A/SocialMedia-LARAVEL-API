@@ -83,6 +83,9 @@ class PostController extends ApiResponseController
     public function destroy(Post $post)
     {
         $post->delete();
+
+
+
         return response()->json(['Post deleted ', 200]);
     }
 
