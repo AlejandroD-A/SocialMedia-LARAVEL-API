@@ -22,4 +22,9 @@ class Post extends Model
     {
         return $this->morphToMany(Tag::class, 'taggable')->withTimestamps();
     }
+
+    public function comments()
+    {
+        return $this->morphToMany(Commentary::class, 'commentable')->withTimestamps();
+    }
 }

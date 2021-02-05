@@ -22,26 +22,10 @@ class TagController extends ApiResponseController
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display Thrend in last 3 hours.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     public function thrends()
     {
         $tags = DB::table('taggables')

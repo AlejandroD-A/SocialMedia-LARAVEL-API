@@ -96,8 +96,13 @@ class PostController extends ApiResponseController
         return response()->json(['Post restored ', 200]);
     }
 
+    public function getComments(Post $post)
+    {
+        $comments = $post->comments;
+        $comments->load('user');
 
-
+        return response()->json($comments, 200);
+    }
     private function uploadImage($image)
     {
         if (env('APP_ENV') == 'local') {
