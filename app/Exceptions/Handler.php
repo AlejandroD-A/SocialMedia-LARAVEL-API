@@ -43,7 +43,7 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
         });
         $this->renderable(function (Exception $e) {
-            if (env('APP_ENV') == 'local') {
+            if (env('APP_ENV') !== 'local') {
                 if ($e instanceof ValidationException) {
                     return $this->errorResponse($e->getMessage(), $code = $e->status, $msj = $e->errors());
                 }

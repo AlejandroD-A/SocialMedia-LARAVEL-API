@@ -11,9 +11,9 @@ class Commentary extends Model
     protected $fillable = ['content', 'user_id'];
 
 
-    public function post()
+    public function commentable()
     {
-        return $this->morphedByMany(Post::class, 'commentable');
+        return $this->morphTo();
     }
 
     public function user()

@@ -17,6 +17,8 @@ class CreateCommentariesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('content', 600);
+            $table->unsignedBigInteger('commentable_id');
+            $table->string('commentable_type');
             $table->timestamps();
         });
     }

@@ -17,7 +17,7 @@ class TagController extends ApiResponseController
      */
     public function index()
     {
-        $tags = Tag::all();
+        $tags = Tag::paginate(20);
         return $this->successResponse($tags);
     }
 
@@ -37,5 +37,18 @@ class TagController extends ApiResponseController
             ->limit(10)
             ->get();
         return $this->successResponse($tags);
+    }
+
+    public function search($param)
+    {
+        $tag = Tag::select('name')
+            ->where('name', 'LIKE', "$param%")
+            ->limit(3)
+            ->get();
+
+        if ($tag === null) {
+            $tag = [];
+        }
+        return $this->successResponse($tag);
     }
 }

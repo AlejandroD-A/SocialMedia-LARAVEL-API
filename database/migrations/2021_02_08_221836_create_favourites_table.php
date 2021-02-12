@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCommentablesTable extends Migration
+class CreateFavouritesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateCommentablesTable extends Migration
      */
     public function up()
     {
-        Schema::create('commentables', function (Blueprint $table) {
-            $table->unsignedBigInteger('commentary_id');
-            $table->unsignedBigInteger('commentable_id');
-            $table->string('commentable_type');
+        Schema::create('favouritables', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('favouritable_id');
+            $table->string('favouritable_type');
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ class CreateCommentablesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('commentables');
+        Schema::dropIfExists('favourites');
     }
 }

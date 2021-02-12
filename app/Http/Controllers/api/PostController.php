@@ -21,10 +21,15 @@ class PostController extends ApiResponseController
      */
     public function index()
     {
-        $posts = Post::with(['tags:id,name', 'user:id,username,avatar'])->orderBy('created_at', 'desc')->paginate(5);
+        $posts = Post::with([
+            'tags:id,name', 'user:id,username,avatar'
+        ])
+            ->select('posts.id', 'posts.title', 'posts.cover', 'posts.created_at', 'posts.user_id')
+            ->orderBy('created_at', 'desc')
+            ->withCount('favourites')
+            ->withCount('comments')
 
-
-
+            ->paginate(5);
         return $this->successResponse($posts);
     }
 

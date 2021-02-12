@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Favouritable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -53,6 +54,23 @@ class User extends Authenticatable
     {
         return $this->hasMany(Commentary::class);
     }
+
+    public function favourites()
+    {
+        return $this->hasMany(Favouritable::class);
+    }
+
+    public function taggables()
+    {
+        return Taggable::where('tag_id', $this->id)->get();
+    }
+
+    public function favouritePosts()
+    {
+        return $this->morphedByMany(Post::class, 'favouritable')->withTimestamps();
+    }
+
+
 
     public function role()
     {
