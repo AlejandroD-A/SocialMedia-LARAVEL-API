@@ -17,6 +17,7 @@ class CommentaryController extends Controller
         $userId = request()->user()->id;
 
         $comment = $post->comments()->create(['user_id' => $userId, 'content' => $data['content']]);
+
         return response()->json($comment, 201);
     }
 }

@@ -13,6 +13,10 @@ class Post extends Model
 
     protected $fillable = ['title', 'content', 'cover'];
     protected $dates = ['deleted_at'];
+    protected $hidden = ['content', 'user_id'];
+
+    protected $appends = ['commentsCount', 'favouritesCount'];
+
 
     public function user()
     {
@@ -22,6 +26,16 @@ class Post extends Model
     public function tags()
     {
         return $this->morphToMany(Tag::class, 'taggable')->withTimestamps();
+    }
+
+    public function getCommentsCountAttribute()
+    {
+        return $this->comments()->count();
+    }
+
+    public function getFavouritesCountAttribute()
+    {
+        return $this->favourites()->count();
     }
 
     public function comments()

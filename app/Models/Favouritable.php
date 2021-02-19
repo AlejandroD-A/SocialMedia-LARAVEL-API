@@ -9,6 +9,7 @@ class Favouritable extends Model
 {
     use HasFactory;
 
+
     public function favouritable()
     {
         return $this->morphTo();

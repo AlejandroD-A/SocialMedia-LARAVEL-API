@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Models\Tag;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Tag;
+use App\Models\Post;
+use App\Models\Taggable;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\api\ApiResponseController;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class TagController extends ApiResponseController
 {
@@ -50,5 +54,16 @@ class TagController extends ApiResponseController
             $tag = [];
         }
         return $this->successResponse($tag);
+    }
+
+
+    public function getAll(Tag $tag)
+    {
+        $all = Taggable::with('taggable.user:id,username,avatar', 'taggable.tags:id,name')
+            ->where('tag_id', '=', $tag->id)
+            ->latest()
+            ->paginate(8);
+
+        return $this->successResponse($all);
     }
 }

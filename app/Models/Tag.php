@@ -9,16 +9,25 @@ class Tag extends Model
 {
     use HasFactory;
 
-
     protected $fillable = ['name'];
+    protected $hidden = ['pivot'];
 
     public function posts()
     {
-        return $this->morphedByMany(Post::class, 'taggable')->withTimestamps();
+        return $this->morphedByMany(Post::class, 'taggable')->with([
+            'tags:id,name', 'user:id,username,avatar'
+        ])
+            ->latest()
+            ->withTimeStamps();
     }
 
-    public function taggables()
+    public function shorts()
     {
-        return Taggable::where('tag_id', $this->id)->get();
+        return $this->morphedByMany(Short::class, 'taggable')->withTimestamps();
+    }
+
+    public function shortsAndPosts()
+    {
+        return $this->hasMany(Taggable::class)->with('taggable')->paginate(5);
     }
 }

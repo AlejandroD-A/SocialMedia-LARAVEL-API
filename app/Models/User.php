@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
     ];
 
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -33,6 +34,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'pivot'
     ];
 
     /**
@@ -50,6 +52,11 @@ class User extends Authenticatable
         return $this->hasMany(Post::class);
     }
 
+    public function shorts()
+    {
+        return $this->hasMany(Short::class);
+    }
+
     public function comments()
     {
         return $this->hasMany(Commentary::class);
@@ -57,12 +64,7 @@ class User extends Authenticatable
 
     public function favourites()
     {
-        return $this->hasMany(Favouritable::class);
-    }
-
-    public function taggables()
-    {
-        return Taggable::where('tag_id', $this->id)->get();
+        return $this->hasMany(Favouritable::class)->with('favouritable');
     }
 
     public function favouritePosts()
@@ -70,7 +72,17 @@ class User extends Authenticatable
         return $this->morphedByMany(Post::class, 'favouritable')->withTimestamps();
     }
 
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'following_id', 'follower_id')
+            ->select('id', 'username', 'avatar')->withTimestamps();
+    }
 
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'following_id')
+            ->select('id', 'username', 'avatar')->withTimestamps();
+    }
 
     public function role()
     {

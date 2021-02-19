@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,16 +30,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(UrlGenerator $url)
     {
-        DB::listen(function ($query) {
-            Log::info(
-                $query->sql,
-                $query->bindings,
-                $query->time
-            );
-        });
+
+        Relation::morphMap([
+            'post' => 'App\Models\Post',
+            'short' => 'App\Models\Short',
+        ]);
+
+        // Used for heroku deply
         if (env('REDIRECT_HTTPS')) {
             $url->formatScheme('https://');
         }
+
+
         Passport::routes();
         Passport::tokensExpireIn(now()->addDays(15));
         Passport::refreshTokensExpireIn(now()->addDays(30));

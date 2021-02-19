@@ -1,12 +1,14 @@
 <?php
 
-use App\Http\Controllers\api\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\PostController;
 use App\Http\Controllers\api\TagController;
-use App\Http\Controllers\api\CommentaryController;
+use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\PostController;
+use App\Http\Controllers\api\ShortController;
+use App\Http\Controllers\api\FollowController;
 use App\Http\Controllers\api\FavouriteController;
+use App\Http\Controllers\api\CommentaryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,30 +25,59 @@ use App\Http\Controllers\api\FavouriteController;
     return $request->user();
 }); */
 
+Route::group(['name' => 'LoggedUsers', 'middleware' => ['auth:api']], function () {
+
+    Route::group(['prefix' => 'posts'], function () {
+        Route::post('/',                  [PostController::class, 'store']);
+        Route::get('/perspective',        [PostController::class, 'perspective']);
+        Route::post('/{post}/comments',   [CommentaryController::class, 'store']);
+        Route::post('/{post}/favourites', [FavouriteController::class, 'storePost']);
+    });
+
+    Route::group(['prefix' => 'shorts'], function () {
+        Route::post('/',                   [ShortController::class, 'store']);
+        Route::post('/{short}/favourites', [FavouriteController::class, 'storeShort']);
+    });
+
+    Route::group(['prefix' => 'user'], function () {
+        Route::get('/favourites', [FavouriteController::class, 'index']);
+        Route::post('/{user}/follow', [FollowController::class, 'store']);
+    });
+});
+
 Route::group(['name' => 'allUsers'], function () {
 
     Route::post('auth/register', [AuthController::class, 'register']);
-    Route::post('auth/login', [AuthController::class, 'login']);
+    Route::post('auth/login',    [AuthController::class, 'login']);
 
-    Route::get('posts/{post}/comment', [PostController::class, 'getComments']);
+    Route::group(['prefix' => 'posts'], function () {
+        Route::get('/{post}/comments', [PostController::class, 'getComments']);
+        Route::get('/',                [PostController::class, 'index']);
+        Route::get('/{post}',          [PostController::class, 'show']);
+        Route::get('/t/{tag}',         [PostController::class, 'tag']);
+    });
+    Route::group(['prefix' => 'shorts'], function () {
+        Route::get('/{short}/comments', [ShortController::class, 'getComments']);
+        Route::get('/',                 [ShortController::class, 'index']);
+        Route::get('/{short}',          [ShortController::class, 'show']);
+        Route::get('/t/{tag}',          [ShortController::class, 'tag']);
+    });
+    Route::group(['prefix' => 'tags'], function () {
+        Route::get('/',               [TagController::class, 'index']);
+        Route::get('/thrends',        [TagController::class, 'thrends']);
+        Route::get('/search/{param}', [TagController::class, 'search']);
+        Route::get('/getAll/{tag}', [TagController::class, 'getAll']);
+    });
 
-    Route::get('posts', [PostController::class, 'index']);
-    Route::get('posts/{post}', [PostController::class, 'show']);
-    Route::get('posts/t/{tag}', [PostController::class, 'tag']);
-
-    Route::get('tag', [TagController::class, 'index']);
-    Route::get('tags/thrends', [TagController::class, 'thrends']);
-    Route::get('tags/search/{param}', [TagController::class, 'search']);
+    Route::group(['prefix' => 'user'], function () {
+        Route::get('/{user}/following', [FollowController::class, 'getFollowing']);
+        Route::get('/{user}/followers', [FollowController::class, 'getFollowers']);
+    });
 });
 
-Route::group(['name' => 'LoggedUsers', 'middleware' => ['auth:api']], function () {
-    Route::post('posts', [PostController::class, 'store']);
-    Route::post('posts/{post}/comment', [CommentaryController::class, 'store']);
-    Route::post('posts/{post}/favourite', [FavouriteController::class, 'store']);
-    Route::get('user/favourite', [FavouriteController::class, 'index']);
-});
 
-Route::group(['name' => 'OnlyAdmin', 'middleware' => ['auth:api', 'checkAdmin']], function () {
-    Route::delete('post/{post}', [PostController::class, 'destroy']);
+
+Route::group(['name' => 'Admin', 'middleware' => ['auth:api', 'checkAdmin']], function () {
+    Route::delete('post/{post}',       [PostController::class, 'destroy']);
     Route::post('post/{post}/restore', [PostController::class, 'restore']);
 });

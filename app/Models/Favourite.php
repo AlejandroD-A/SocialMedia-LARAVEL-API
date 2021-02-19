@@ -8,9 +8,4 @@ use Illuminate\Database\Eloquent\Model;
 class Favourite extends Model
 {
     use HasFactory;
-
-    public function favouritable()
-    {
-        return $this->morphTo();
-    }
 };

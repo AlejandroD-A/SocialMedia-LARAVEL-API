@@ -4,10 +4,12 @@ namespace App\Http\Controllers\api;
 
 use App\Models\Tag;
 use App\Models\Post;
+use App\Models\User;
+use App\Models\Short;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\DB;
 use App\http\Requests\StorePostPost;
-
 use Intervention\Image\Facades\Image;
 use App\Http\Controllers\api\ApiResponseController;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
@@ -24,12 +26,28 @@ class PostController extends ApiResponseController
         $posts = Post::with([
             'tags:id,name', 'user:id,username,avatar'
         ])
-            ->select('posts.id', 'posts.title', 'posts.cover', 'posts.created_at', 'posts.user_id')
-            ->orderBy('created_at', 'desc')
-            ->withCount('favourites')
-            ->withCount('comments')
+            ->latest()
 
             ->paginate(5);
+
+        return $this->successResponse($posts);
+    }
+
+    public function perspective(Request $request)
+    {
+        $users = request()->user()->following;
+        $posts = Post::whereIn('user_id', $users)
+            ->with('tags:name', 'user:id,username,avatar')
+            ->select(
+                'posts.id',
+                'posts.title',
+                'posts.cover',
+                'posts.created_at',
+                'posts.user_id'
+            )
+            ->orderBy('id', 'desc')
+            ->paginate(5);
+
         return $this->successResponse($posts);
     }
 
@@ -41,14 +59,16 @@ class PostController extends ApiResponseController
      */
     public function show(Post $post)
     {
-        $post->load('tags');
+        $post->load('tags:name', 'user:id,username,avatar');
+        $post = $post->makeVisible('content')->toArray();
+
         return $this->successResponse($post);
     }
 
     public function tag(Tag $tag)
     {
-        $posts = $tag->posts()->orderBy('created_at', 'desc')->paginate(5);
-        $posts->load('tags');
+        $posts = $tag->shortsAndPosts();
+
         return $this->successResponse(["tag" => $tag->name, "posts" => $posts]);
     }
 
