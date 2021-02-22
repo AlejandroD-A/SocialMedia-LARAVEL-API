@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\TagController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\PostController;
+use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\ShortController;
 use App\Http\Controllers\api\FollowController;
 use App\Http\Controllers\api\FavouriteController;
@@ -40,7 +41,8 @@ Route::group(['name' => 'LoggedUsers', 'middleware' => ['auth:api']], function (
     });
 
     Route::group(['prefix' => 'user'], function () {
-        Route::get('/favourites', [FavouriteController::class, 'index']);
+        Route::get('/favourites',    [FavouriteController::class, 'index']);
+        Route::put('/update',    [UserController::class, 'updateProfile']);
         Route::post('/{user}/follow', [FollowController::class, 'store']);
     });
 });
@@ -56,20 +58,23 @@ Route::group(['name' => 'allUsers'], function () {
         Route::get('/{post}',          [PostController::class, 'show']);
         Route::get('/t/{tag}',         [PostController::class, 'tag']);
     });
+
     Route::group(['prefix' => 'shorts'], function () {
         Route::get('/{short}/comments', [ShortController::class, 'getComments']);
         Route::get('/',                 [ShortController::class, 'index']);
         Route::get('/{short}',          [ShortController::class, 'show']);
         Route::get('/t/{tag}',          [ShortController::class, 'tag']);
     });
+
     Route::group(['prefix' => 'tags'], function () {
         Route::get('/',               [TagController::class, 'index']);
         Route::get('/thrends',        [TagController::class, 'thrends']);
         Route::get('/search/{param}', [TagController::class, 'search']);
-        Route::get('/getAll/{tag}', [TagController::class, 'getAll']);
+        Route::get('/getAll/{tag}',   [TagController::class, 'getAll']);
     });
 
     Route::group(['prefix' => 'user'], function () {
+        Route::get('/{user}',         [UserController::class, 'show']);
         Route::get('/{user}/following', [FollowController::class, 'getFollowing']);
         Route::get('/{user}/followers', [FollowController::class, 'getFollowers']);
     });

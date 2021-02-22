@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Short extends Model
 {
     use HasFactory;
+    
     protected $fillable = ['content'];
 
     protected $hidden = ['user_id'];

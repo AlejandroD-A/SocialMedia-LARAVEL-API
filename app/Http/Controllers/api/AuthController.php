@@ -21,8 +21,11 @@ class AuthController extends ApiResponseController
 
         $user = User::create($request->all());
 
+        $user->profile()->create(['']);
+
         $token = $user->createToken('authToken')->accessToken;
 
+        $user->profile;
         return $this->successResponse(['user' => $user, 'access_token' => $token], 201);
     }
 
