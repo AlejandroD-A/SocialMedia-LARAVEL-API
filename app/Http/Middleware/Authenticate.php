@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
 class Authenticate extends Middleware
@@ -14,8 +15,11 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
+        if ($request->is('api/*')) {
+            throw new HttpResponseException(response()->json(['failure_reason' => 'Fresh Access Token Required'], 403));
+        }
         if (!$request->expectsJson()) {
-            return response()->json('403 Forbidden', 403);
+            return response()->json(['failure_reason' => 'Fresh Access Token Required'], 403);
         }
     }
 }
