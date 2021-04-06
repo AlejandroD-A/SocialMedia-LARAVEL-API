@@ -48,7 +48,7 @@ class Handler extends ExceptionHandler
                 === 'local'
             ) {
                 if ($e instanceof ValidationException) {
-                    return $this->errorResponse($e->getMessage(), $code = $e->status, $msj = $e->errors());
+                    return $this->errorResponse(array('errors' => $e->errors()), $code = $e->status, $msj = $e->getMessage());
                 }
                 if ($e instanceof NotFoundHttpException) {
                     return $this->errorResponse("Pagina no encontrada", $code = 404, $msj = "Pagina no encontrada");
