@@ -25,7 +25,8 @@ class ShortPostRequest extends FormRequest
     {
         return [
             'content' => 'required | min:5',
-            'tags.*.name' => 'min:2 | max:30'
+            'tags.*.name' => 'min:2 | max:30',
+            'images' => 'mimes:jpeg,bmp,png|max:5000'
         ];
     }
 }
