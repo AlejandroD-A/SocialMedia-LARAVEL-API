@@ -9,6 +9,7 @@ use App\Models\Short;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use App\http\Requests\StorePostPost;
 use Intervention\Image\Facades\Image;
 use App\Http\Controllers\api\ApiResponseController;
@@ -24,7 +25,7 @@ class PostController extends ApiResponseController
     public function index()
     {
         $posts = Post::with([
-            'tags:id,name', 'user:id,username,avatar'
+            'tags:id,name', 'user:id,username'
         ])
             ->latest()
 
@@ -36,16 +37,12 @@ class PostController extends ApiResponseController
     public function perspective(Request $request)
     {
         $users = request()->user()->following;
+
         $posts = Post::whereIn('user_id', $users)
-            ->with('tags:name', 'user:id,username,avatar')
-            ->select(
-                'posts.id',
-                'posts.title',
-                'posts.cover',
-                'posts.created_at',
-                'posts.user_id'
-            )
-            ->orderBy('id', 'desc')
+            ->with([
+                'tags:id,name', 'user:id,username'
+            ])
+            ->latest()
             ->paginate(5);
 
         return $this->successResponse($posts);
@@ -83,8 +80,8 @@ class PostController extends ApiResponseController
             unset($validated['tags']);
         }
 
-        $post = new Post($validated);
         $imagePath = $this->uploadImage($validated['cover']);
+        $post = new Post($validated);
 
         $post->cover = $imagePath;
 
@@ -130,11 +127,12 @@ class PostController extends ApiResponseController
     }
     private function uploadImage($image)
     {
-        if (env('APP_ENV') == 'local') {
+
+        if (App::environment('local')) {
             $imagePath = $image->store('uploads', 'public');
-            $imageUpload = Image::make(public_path("storage/{$imagePath}"))->fit(1200, 1200);
+            $imageUpload = Image::make(public_path("storage/{$imagePath}"))->fit(1200, 400);
             $imageUpload->save();
-            return $imagePath;
+            return "http://localhost:8000/storage/{$imagePath}";
         } else {
 
             $imagePath = Cloudinary::upload($image->getRealPath(), [

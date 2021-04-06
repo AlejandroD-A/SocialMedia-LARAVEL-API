@@ -27,6 +27,7 @@ use App\Http\Controllers\api\CommentaryController;
 }); */
 
 Route::group(['name' => 'LoggedUsers', 'middleware' => ['auth:api']], function () {
+    Route::get('auth/user', [AuthController::class, 'user']);
 
     Route::group(['prefix' => 'posts'], function () {
         Route::post('/',                  [PostController::class, 'store']);
@@ -37,6 +38,7 @@ Route::group(['name' => 'LoggedUsers', 'middleware' => ['auth:api']], function (
 
     Route::group(['prefix' => 'shorts'], function () {
         Route::post('/',                   [ShortController::class, 'store']);
+        Route::get('/perspective',         [ShortController::class, 'perspective']);
         Route::post('/{short}/favourites', [FavouriteController::class, 'storeShort']);
     });
 
