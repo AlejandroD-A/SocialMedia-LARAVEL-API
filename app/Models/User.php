@@ -79,13 +79,13 @@ class User extends Authenticatable
     public function followers()
     {
         return $this->belongsToMany(User::class, 'followers', 'following_id', 'follower_id')
-            ->select('id', 'username', 'avatar')->withTimestamps();
+            ->withTimestamps();
     }
 
     public function following()
     {
         return $this->belongsToMany(User::class, 'followers', 'follower_id', 'following_id')
-            ->select('id', 'username', 'avatar')->withTimestamps();
+            ->withTimestamps();
     }
 
     public function role()
