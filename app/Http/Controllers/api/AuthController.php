@@ -22,11 +22,7 @@ class AuthController extends ApiResponseController
         $user = User::create($request->all());
 
         $user->profile()->create(['']);
-
-        $token = $user->createToken('authToken')->accessToken;
-
-        $user->profile;
-        return $this->successResponse(['user' => $user, 'access_token' => $token], 201);
+        return $this->successResponse('', 201, 'Created Succesfully');
     }
 
     public function login(Request $request)
@@ -38,10 +34,18 @@ class AuthController extends ApiResponseController
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return $this->errorResponse('0', 401, 'invalid Credentials');
+            return $this->errorResponse($data = array('errors' => 'invalid Credentials'), $code = 403, 'invalid Credentials');
         }
         $user = $request->user();
         $token = $user->createToken('authToken');
-        return response()->json(['user' => $user, 'access_token' => $token->accessToken, 'token_type' => 'Bearer ', 'expires_at' => Carbon::parse($token->token->expires_at)->toDateTimeString()]);
+        return $this->successResponse(['user' => $user, 'access_token' => $token->accessToken, 'token_type' => 'Bearer ', 'expires_at' => Carbon::parse($token->token->expires_at)->toDateTimeString()]);
+    }
+
+    public function user(Request $request)
+    {
+        $user = Auth::user();
+        $user->profile;
+
+        return $this->successResponse(['user' => $user]);
     }
 }
