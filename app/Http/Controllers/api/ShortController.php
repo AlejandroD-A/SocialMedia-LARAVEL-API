@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Intervention\Image\Facades\Image;
 use App\Http\Requests\ShortPostRequest;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\api\ApiResponseController;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
@@ -134,7 +135,7 @@ class ShortController extends ApiResponseController
             $imageUpload->save();
             return "http://localhost:8000/storage/{$imagePath}";
         } else {
-            $imagePath = Cloudinary::upload($image->getRealPath(), [
+            /* $imagePath = Cloudinary::upload($image->getRealPath(), [
                 'folder' => 'uploads',
                 'transformation' => [
                     'width' => 1200,
@@ -142,9 +143,20 @@ class ShortController extends ApiResponseController
                     'quality' => 'auto',
                     'fetch_format' => 'auto'
                 ]
-            ])->getSecurePath();
+            ])->getSecurePath(); */
 
-            return $imagePath;
+            $imageFile = Image::make($image)->fit(1200, 400);
+            $imageFile = $imageFile->stream();
+
+            $info = pathinfo($image->getClientOriginalName());
+            $ext = $info['extension'];
+            $imageName = uniqid() . ".$ext";
+
+
+            Storage::disk('s3')->put("/imagesShorts/$imageName", (string)$imageFile);
+            $path = "https://mediaesebucket.s3-sa-east-1.amazonaws.com/imagesShorts/$imageName";
+
+            return $path;
         }
     }
 }
