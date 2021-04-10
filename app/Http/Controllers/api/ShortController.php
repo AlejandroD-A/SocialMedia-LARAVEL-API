@@ -131,7 +131,7 @@ class ShortController extends ApiResponseController
 
         if (App::environment('local')) {
             $imagePath = $image->store('uploads', 'public');
-            $imageUpload = Image::make(public_path("storage/{$imagePath}"))->fit(1200, 400);
+            $imageUpload = Image::make(public_path("storage/{$imagePath}"))->fit(1080, 1080);
             $imageUpload->save();
             return "http://localhost:8000/storage/{$imagePath}";
         } else {
@@ -145,7 +145,7 @@ class ShortController extends ApiResponseController
                 ]
             ])->getSecurePath(); */
 
-            $imageFile = Image::make($image)->fit(1200, 400);
+            $imageFile = Image::make($image)->fit(1080, 1080);
             $imageFile = $imageFile->stream();
 
             $info = pathinfo($image->getClientOriginalName());
