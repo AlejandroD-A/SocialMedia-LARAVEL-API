@@ -55,7 +55,7 @@ class ShortController extends ApiResponseController
 
         $shorts = Short::whereIn('user_id', $users)
             ->with([
-                'tags:id,name', 'user:id,username'
+                'tags:id,name', 'user:id,username', 'images:short_id,url'
             ])
             ->latest()
             ->paginate(5);
