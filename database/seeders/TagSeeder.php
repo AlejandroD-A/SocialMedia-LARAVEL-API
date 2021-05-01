@@ -14,7 +14,6 @@ class TagSeeder extends Seeder
      */
     public function run()
     {
-        Tag::truncate();
 
         for ($i = 0; $i <= 20; $i++) {
             Tag::create(["name" => "tag $i"]);

@@ -15,7 +15,6 @@ class ShortSeeder extends Seeder
      */
     public function run()
     {
-        Short::truncate();
 
         $user = User::first();
         for ($i = 0; $i <= 20; $i++) {

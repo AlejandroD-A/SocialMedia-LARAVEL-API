@@ -16,7 +16,6 @@ class PostSeeder extends Seeder
      */
     public function run()
     {
-        Post::truncate();
 
         $user = User::first();
         for ($i = 0; $i <= 20; $i++) {

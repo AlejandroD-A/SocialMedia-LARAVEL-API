@@ -14,7 +14,6 @@ class RolesSeeder extends Seeder
      */
     public function run()
     {
-        Role::truncate();
 
         Role::create(['key' => 'admin', 'name' => 'Administrador ', 'description' => 'Administrador']);
         Role::create(['key' => 'regular', 'name' => 'Regular User', 'description' => 'Regular']);

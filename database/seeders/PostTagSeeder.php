@@ -17,7 +17,6 @@ class PostTagSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('taggables')->truncate();
 
         $posts = Post::all();
         $shorts = Short::all();
