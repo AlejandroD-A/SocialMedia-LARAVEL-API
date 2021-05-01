@@ -4,17 +4,23 @@ namespace App\Http\Controllers\api;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Facades\Image;
 
 class UserController extends ApiResponseController
 {
 
-    public function show(User $user)
+    public function show(Request $request, User $user)
     {
 
         $user->profile;
 
-        return $this->successResponse(['user' => $user]);
+        $loggedUser = Auth::guard('api')->user();
+        $isFollow = false;
+        if ($loggedUser) {
+            $isFollow = $loggedUser->following->contains($user->id) ? true : false;
+        }
+        return $this->successResponse(['user' => $user, 'isFollow' => $isFollow]);
     }
 
     public function updateProfile()
