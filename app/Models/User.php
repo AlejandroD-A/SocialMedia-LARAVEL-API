@@ -46,6 +46,28 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+
+    protected static function boot()
+    {
+        parent::boot();
+
+
+
+        static::created(
+
+            function ($user) {
+                $avatars = [
+                    'https://mediaesebucket.s3-sa-east-1.amazonaws.com/avatarsini/avatar1.png',
+                    'https://mediaesebucket.s3-sa-east-1.amazonaws.com/avatarsini/avatar2.png',
+                    'https://mediaesebucket.s3-sa-east-1.amazonaws.com/avatarsini/avatar3.png',
+                    'https://mediaesebucket.s3-sa-east-1.amazonaws.com/avatarsini/avatar4.png'
+                ];
+
+                $user->avatar = $avatars[rand(0, 3)];
+                $user->save();
+            }
+        );
+    }
     public function profile()
     {
         return $this->hasOne(Profile::class);
@@ -76,6 +98,10 @@ class User extends Authenticatable
         return $this->morphedByMany(Post::class, 'favouritable')->withTimestamps();
     }
 
+    public function favouriteShorts()
+    {
+        return $this->morphedByMany(Short::class, 'favouritable')->withTimestamps();
+    }
     public function followers()
     {
         return $this->belongsToMany(User::class, 'followers', 'following_id', 'follower_id')
