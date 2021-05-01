@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\Tag;
+use App\Models\User;
 use App\Models\Short;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Intervention\Image\Facades\Image;
 use App\Http\Requests\ShortPostRequest;
@@ -27,10 +28,7 @@ class ShortController extends ApiResponseController
             'tags:id,name', 'user:id,username,avatar', 'images:short_id,url'
         ])
             ->latest()
-            ->paginate(5);
-
-
-
+            ->paginate(8);
         return $this->successResponse($shorts);
     }
 
@@ -49,7 +47,7 @@ class ShortController extends ApiResponseController
 
     public function perspective(Request $request)
     {
-        $users = request()->user()->following;
+        $users = request()->user()->following()->pluck('id');
 
         $users->push(request()->user()->id);
 
@@ -58,7 +56,7 @@ class ShortController extends ApiResponseController
                 'tags:id,name', 'user:id,username', 'images:short_id,url'
             ])
             ->latest()
-            ->paginate(5);
+            ->paginate(8);
 
         return $this->successResponse($shorts);
     }
