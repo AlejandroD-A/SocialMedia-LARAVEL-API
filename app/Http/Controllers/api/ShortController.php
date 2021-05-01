@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\Tag;
-use App\Models\User;
 use App\Models\Short;
 use Illuminate\Http\Request;
 
@@ -13,6 +12,7 @@ use Intervention\Image\Facades\Image;
 use App\Http\Requests\ShortPostRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\api\ApiResponseController;
+use Carbon\Carbon;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ShortController extends ApiResponseController
@@ -71,9 +71,10 @@ class ShortController extends ApiResponseController
 
     public function store(ShortPostRequest $request)
     {
-
-
         $user = $request->user();
+
+
+
         $validated = $request->validated();
         $tags = [];
         $imagePaths = [];
@@ -82,6 +83,13 @@ class ShortController extends ApiResponseController
             unset($validated['tags']);
         }
         if (array_key_exists('images', $validated)) {
+            $shorts = $user->shorts()->has('images')->where('created_at', '>', Carbon::now()->subDay())->get();
+
+            if ($shorts->count() >= 5) {
+                return $this->errorResponse(['errors' => ['shorts' => ['Se llego al limite diario de imagenes']]], 422, 'Se llego al limite diario');
+            }
+
+
             foreach ($validated['images'] as $image) {
                 $imagePath = $this->uploadImage($image);
                 array_push($imagePaths, ['url' => $imagePath]);
@@ -107,6 +115,9 @@ class ShortController extends ApiResponseController
 
             $short->images()->createMany($imagePaths);
         });
+
+
+
 
         return $this->successResponse($short->load([
             'tags:id,name', 'user:id,username,avatar', 'images:short_id,url'
