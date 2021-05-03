@@ -38,6 +38,8 @@ class AuthController extends ApiResponseController
         }
         $user = $request->user();
         $token = $user->createToken('authToken');
+        $user->profile;
+        $user->favouriteShorts;
         return $this->successResponse(['user' => $user, 'access_token' => $token->accessToken, 'token_type' => 'Bearer ', 'expires_at' => Carbon::parse($token->token->expires_at)->toDateTimeString()]);
     }
 
@@ -45,6 +47,7 @@ class AuthController extends ApiResponseController
     {
         $user = Auth::user();
         $user->profile;
+        $user->favouriteShorts;
 
         return $this->successResponse(['user' => $user]);
     }
