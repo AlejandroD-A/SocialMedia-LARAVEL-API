@@ -1,6 +1,6 @@
-# SOcial Media, Api usando Laravel
+# Social Media Api usando Laravel
 
-Simple API en laravel para utilizar sus recursos en aplicacion creada en React!
+Api simple en laravel para utilizar sus recursos en aplicacion creada en React!
 
 ## Comenzando 🚀
 
